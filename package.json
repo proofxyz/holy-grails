@@ -1,0 +1,17 @@
+{
+  "name": "holy-grails",
+  "version": "1.0.0",
+  "description": "Remove private EXIF data from media files",
+  "repository": "https://github.com/proofxyz/holy-grails.git",
+  "module": "index.mjs",
+  "author": "furf",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "node index.mjs"
+  },
+  "dependencies": {
+    "exiftool-vendored": "^18.6.0",
+    "mkdirp": "^1.0.4"
+  }
+}

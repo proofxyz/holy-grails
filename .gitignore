@@ -1,0 +1,17 @@
+# Artifacts
+/dirty
+/processing
+/processed
+/clean
+
+
+# Dependencies
+/node_modules
+
+# System
+.DS_Store
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
