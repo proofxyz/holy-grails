@@ -8,10 +8,11 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "dev": "node index.mjs"
+    "clean": "node index.mjs"
   },
   "dependencies": {
     "exiftool-vendored": "^18.6.0",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "uuid": "^9.0.0"
   }
 }

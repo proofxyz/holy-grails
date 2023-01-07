@@ -1,16 +1,18 @@
 import { exiftool } from 'exiftool-vendored';
 import path from 'path';
 import { exit } from 'process';
+import { v4 as uuid } from 'uuid';
 
-import { copy, dirp, move, remove } from './src/file.mjs';
+import { copy, makeDir, move, remove, traverse } from './src/file.mjs';
 import { log } from './src/log.mjs';
 import { discoveredUnwritableTags, unwritableTags } from './src/tags.mjs';
 
 // Constants
-const DIRTY_DIR = './dirty';
-const PROCESSING_DIR = './processing';
-const PROCESSED_DIR = './processed';
-const CLEAN_DIR = './clean';
+const ASSET_DIR = './assets';
+const DIRTY_DIR = `${ASSET_DIR}/dirty`;
+const PROCESSING_DIR = `${ASSET_DIR}/processing`;
+const PROCESSED_DIR = `${ASSET_DIR}/processed`;
+const CLEAN_DIR = `${ASSET_DIR}/clean`;
 
 // Config
 const DEBUG_MODE = false;
@@ -23,28 +25,30 @@ if (DEBUG_MODE) {
   log('🐛', 'Debug mode enabled.');
 }
 
-// TODO Read files/recurse directories
-const files = [
-  'nested/coffee.jpg',
-  'decaf.jpg',
-  'ooA8ZhkBNgPgjWvCUtVQxTeXWBMZ8YCbsECodQSxnyrGfFTMLSd.png',
-  'FuturePROOF.mp4',
-];
+const files = await traverse(DIRTY_DIR);
+
 log('🤓', `Reading ${files.length} files from ${DIRTY_DIR}…`);
 
 for (let i = 0, n = files.length; i < n; i += 1) {
-  const filepath = files[i];
+  const file = files[i];
+  const filepath = path.relative(DIRTY_DIR, file);
   const filename = path.basename(filepath);
   const dirtyFilepath = path.join(DIRTY_DIR, filepath);
   const processingFilepath = path.join(PROCESSING_DIR, filepath);
   const backupFilepath = `${processingFilepath}_original`;
-  const cleanFilepath = path.join(CLEAN_DIR, filepath);
+  const parsedFilepath = path.parse(filepath);
+  const obfuscatedFilepath = path.format({
+    dir: parsedFilepath.dir,
+    name: uuid(),
+    ext: parsedFilepath.ext,
+  });
+  const cleanFilepath = path.join(CLEAN_DIR, obfuscatedFilepath);
   const processedFilepath = path.join(PROCESSED_DIR, filepath);
 
-  log('🖼 ', dirtyFilepath);
+  log('🖼 ', dirtyFilepath, filepath);
 
   // Create nested processing directory, if it doesn't exist.
-  await dirp(path.dirname(processingFilepath));
+  await makeDir(path.dirname(processingFilepath));
 
   // Copy dirty file to processing file. ExifTool will back up the file, but
   // it adds a suffix to the filename, which is "destructive".
@@ -68,9 +72,9 @@ for (let i = 0, n = files.length; i < n; i += 1) {
 
     try {
       await exiftool.write(processingFilepath, { [key]: null });
-      log('🟢', `Deleted ${key} from ${filename}`);
+      log('🟢', `Removed ${key} from ${filename}`);
     } catch (error) {
-      log('⛔️', `Unable to delete ${key} from ${filename}`);
+      log('⛔️', `Unable to remove ${key} from ${filename}`);
       unwritableTags.add(key);
       discoveredUnwritableTags.add(key);
     }
@@ -80,13 +84,13 @@ for (let i = 0, n = files.length; i < n; i += 1) {
   await remove(backupFilepath);
 
   // Create nested clean directory, if it doesn't exist.
-  await dirp(path.dirname(cleanFilepath));
+  await makeDir(path.dirname(cleanFilepath));
 
   // Move processing file to clean directory.
   await move(processingFilepath, cleanFilepath);
 
   // Create nested processed directory, if it doesn't exist.
-  await dirp(path.dirname(processedFilepath));
+  await makeDir(path.dirname(processedFilepath));
 
   // Move dirty file to processed directory.
   await move(dirtyFilepath, processedFilepath);
@@ -102,8 +106,8 @@ for (let i = 0, n = files.length; i < n; i += 1) {
 
 // Log discovered unwritable tags so that they can be added to tags.txt.
 if (discoveredUnwritableTags.size > 0) {
-  log('🚫', 'Discovered new unwritable tags:');
-  log(JSON.stringify(Array.from(discoveredUnwritableTags), null, 2));
+  const newTags = Array.from(discoveredUnwritableTags);
+  log('🚫', `Discovered new unwritable tags: ${newTags.join(', ')}`);
 }
 
 exit(0);
