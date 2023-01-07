@@ -1,6 +1,8 @@
 # Please keep tags sorted in alphabetical order
 
 Aperture
+APP14Flags0
+APP14Flags1
 AverageBitrate
 AvgBitrate
 BitDepth
@@ -12,12 +14,16 @@ CircleOfConfusion
 CMMFlags
 ColorComponents
 ColorSpaceData
+ColorTransform
 ColorType
 CompatibleBrands
 CompressorID
 CompressorName
 ConnectionSpaceIlluminant
+CurrentIPTCDigest
 CurrentTime
+DateTimeCreated
+DCTEncodeVersion
 DeviceAttributes
 DeviceManufacturer
 DeviceModel
@@ -46,6 +52,7 @@ HandlerDescription
 HandlerType
 HandlerVendorID
 HasExtendedXMP
+HasRealMergedData
 HyperfocalDistance
 ImageHeight
 ImageSize
@@ -69,14 +76,21 @@ MIMEType
 MinorVersion
 MovieHeaderVersion
 NextTrackID
+NumSlices
 OpColor
+PhotoshopFormat
 PixelAspectRatio
+PortraitRelightingLightPos
+PortraitRelightingRenderingOptions
 PosterTime
 PreferredRate
 PreferredVolume
 PreviewDuration
 PreviewTime
 PrimaryPlatform
+PrintPosition
+PrintScale
+PrintStyle
 ProfileClass
 ProfileCMMType
 ProfileConnectionSpace
@@ -86,14 +100,18 @@ ProfileDescription
 ProfileFileSignature
 ProfileID
 ProfileVersion
+ReaderName
 RedMatrixColumn
 RedTRC
+RelitInputImageData
+RelitInputImageMime
 RenderingIntent
 Rotation
 ScaleFactor35efl
 SelectionDuration
 SelectionTime
 ShutterSpeed
+SlicesGroupName
 SourceFile
 SourceImageHeight
 SourceImageWidth
@@ -108,5 +126,6 @@ TrackVolume
 tz
 tzSource
 VideoFrameRate
+WriterName
 XResolution
 YResolution
