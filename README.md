@@ -10,6 +10,7 @@ $ git clone https://github.com/proofxyz/holy-grails.git
 1. Place media assets in `source` directory.
 2. In a terminal application:
    ```sh
+   $ cd path/to/holy-grails
    $ yarn start
    ```
 
