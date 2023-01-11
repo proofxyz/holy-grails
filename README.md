@@ -2,6 +2,9 @@
 Tools for processing Grails media assets
 
 ## Installation
+```sh
+$ git clone https://github.com/proofxyz/holy-grails.git
+```
 
 ## Usage
 1. Place media assets in `source` directory.
