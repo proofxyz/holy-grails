@@ -2,13 +2,19 @@
 Tools for processing Grails media assets
 
 ## Installation
+```sh
+$ git clone https://github.com/proofxyz/holy-grails.git
+```
 
 ## Usage
 1. Place media assets in `source` directory.
 2. In a terminal application:
    ```sh
+   $ cd path/to/holy-grails
    $ yarn start
    ```
+
+The application will log output as it processes the assets.
 
 ```
 1/11/2023, 11:54:10 AM (0.0s) 🤓 Reading 2 files from ./assets/source…
@@ -17,6 +23,8 @@ Tools for processing Grails media assets
 1/11/2023, 11:54:10 AM (0.3s) ------------------------------------
 1/11/2023, 11:54:10 AM (0.3s) 🙌 Done! All files processed successfully.
 ```
+
+It will report the results when it is finished.
 
 ```
 1/11/2023, 11:55:03 AM (0.0s) 🤓 Processing 3 files from ./assets/source…
