@@ -14,6 +14,8 @@ $ git clone https://github.com/proofxyz/holy-grails.git
    $ yarn start
    ```
 
+The application will log output as it processes the assets.
+
 ```
 1/11/2023, 11:54:10 AM (0.0s) 🤓 Reading 2 files from ./assets/source…
 1/11/2023, 11:54:10 AM (0.1s) 🟢 (1/2) PXL_20230110_181601256.jpg
@@ -21,6 +23,8 @@ $ git clone https://github.com/proofxyz/holy-grails.git
 1/11/2023, 11:54:10 AM (0.3s) ------------------------------------
 1/11/2023, 11:54:10 AM (0.3s) 🙌 Done! All files processed successfully.
 ```
+
+It will report the results when it is finished.
 
 ```
 1/11/2023, 11:55:03 AM (0.0s) 🤓 Processing 3 files from ./assets/source…
