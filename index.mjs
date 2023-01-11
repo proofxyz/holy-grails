@@ -57,17 +57,16 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     directoryIndex++;
   }
 
-  const hash = md5(`${HASH_SALT}-${sourceName}${sourceExt}`);
+  // If the file is at root, use an md5 hash for the filename.
+  const sourceDirIsRoot = sourceDir === '.';
+  const hash = sourceDirIsRoot
+    ? md5(`${HASH_SALT}-${sourceName}${sourceExt}`)
+    : path.basename(sourceDir);
   const cleanFile = path.format({
     dir: path.join(CLEAN_DIR, sourceDir),
     name: `${directoryIndex}.${hash}`,
     ext: sourceExt,
   });
-
-  // Begin!
-  if (DEBUG_MODE) {
-    log('🖼 ', pathRelativeToSourceDirectory);
-  }
 
   // Copy source file to a temporary processing directory.
   await copy(sourceFile, processingFile);
