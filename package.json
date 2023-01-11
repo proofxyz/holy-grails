@@ -11,7 +11,7 @@
     "start": "node index.mjs"
   },
   "dependencies": {
-    "exiftool-vendored": "^18.6.0",
+    "dist-exiftool": "^10.53.0",
     "mkdirp": "^1.0.4",
     "uuid": "^9.0.0"
   }
