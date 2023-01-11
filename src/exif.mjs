@@ -7,10 +7,9 @@ export async function removeTags(file) {
   return new Promise((resolve, reject) => {
     exec(`${exiftool} -all:all= ${file}`, (error, stdout, stderr) => {
       if (error) {
-        reject(stderr);
-      } else {
-        resolve(stdout);
+        return reject(stderr);
       }
+      resolve(stdout);
     });
   });
 }

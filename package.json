@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "dist-exiftool": "^10.53.0",
+    "md5": "^2.3.0",
     "mkdirp": "^1.0.4",
+    "rimraf": "^3.0.2",
     "uuid": "^9.0.0"
   }
 }

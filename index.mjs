@@ -1,10 +1,11 @@
 import path from 'path';
 import { v4 as uuid } from 'uuid';
+import md5 from 'md5';
 
 import {
   CLEAN_DIR,
   DEBUG_MODE,
-  ERROR_DIR,
+  HASH_SALT,
   PROCESSING_DIR,
   SOURCE_DIR,
 } from './src/constants.mjs';
@@ -27,6 +28,9 @@ function count() {
   return `(${processedCount}/${files.length})`;
 }
 
+let directoryIndex = -1;
+let previousSourceDir = '';
+
 for (let i = 0, n = files.length; i < n; i += 1) {
   // Original file info
   const sourceFile = files[i];
@@ -46,16 +50,17 @@ for (let i = 0, n = files.length; i < n; i += 1) {
   const backupFile = `${processingFile}${ORIGINAL_SUFFIX}`;
 
   // The clean file is the asset without its original metadata.
+  if (sourceDir !== previousSourceDir) {
+    previousSourceDir = sourceDir;
+    directoryIndex = 0;
+  } else {
+    directoryIndex++;
+  }
+
+  const hash = md5(`${HASH_SALT}-${sourceName}${sourceExt}`);
   const cleanFile = path.format({
     dir: path.join(CLEAN_DIR, sourceDir),
-    name: uuid(),
-    ext: sourceExt,
-  });
-
-  // The error file is a copy of the original asset.
-  const errorFile = path.format({
-    dir: path.join(ERROR_DIR, sourceDir),
-    name: sourceName,
+    name: `${directoryIndex}.${hash}`,
     ext: sourceExt,
   });
 
@@ -81,7 +86,7 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     await remove(backupFile);
 
     // Log status.
-    log('🟢', count(), pathRelativeToSourceDirectory);
+    log(`🟢 ${count()}\t${pathRelativeToSourceDirectory}`);
   } catch (error) {
     // Increment error count.
     errorCount++;
@@ -89,33 +94,25 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     // Remove processing file.
     await remove(processingFile);
 
-    // Copy unprocessed file to error directory.
-    await copy(sourceFile, errorFile);
-
     // Log status.
     if (typeof error === 'string') {
       // Processing error.
-      log('🔴', count(), error.trim());
+      const exifError = error.split(' - ')[0];
+      log(`🔴 ${count()}\t${pathRelativeToSourceDirectory}`);
+      log(`\t\t${exifError}`);
     } else {
       // Misc. error.
       log('🟡', error.message.trim());
     }
   }
+}
 
-  // Report status
+await remove(PROCESSING_DIR);
 
-  const remaining = files.length - i - 1;
-  if (remaining > 0) {
-    if (DEBUG_MODE) {
-      log('💪', `${remaining}/${files.length} files remaining…`);
-    }
-  } else {
-    log('------------------------------------');
-    if (errorCount > 0) {
-      const pluralized = errorCount > 1 ? 'errors' : 'error';
-      log('✋', `Done. Encountered ${errorCount} ${pluralized}.`);
-    } else {
-      log('🙌', 'Done! All files processed successfully.');
-    }
-  }
+log('------------------------------------------------------------------------');
+if (errorCount > 0) {
+  const pluralized = errorCount > 1 ? 'errors' : 'error';
+  log('✋', `Done. Encountered ${errorCount} ${pluralized}.`);
+} else {
+  log('🙌', 'Done! All files processed successfully.');
 }

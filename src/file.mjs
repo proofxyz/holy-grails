@@ -1,6 +1,7 @@
 import fss, { promises as fs } from 'fs';
 import mkdirp from 'mkdirp';
 import path from 'path';
+import rimraf from 'rimraf';
 
 import { DEBUG_MODE } from './constants.mjs';
 import { log } from './log.mjs';
@@ -29,10 +30,17 @@ export async function move(origin, destination) {
 }
 
 export async function remove(filepath) {
-  await fs.rm(filepath);
-  if (DEBUG_MODE) {
-    log('🗑 ', `Deleted ${filepath}`);
-  }
+  return new Promise((resolve, reject) => {
+    rimraf(filepath, (error) => {
+      if (error) {
+        return reject(error);
+      }
+      if (DEBUG_MODE) {
+        log('🗑 ', `Deleted ${filepath}`);
+      }
+      resolve();
+    });
+  });
 }
 
 const ignoredFilenames = new Set(['.DS_Store']);
