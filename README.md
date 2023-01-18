@@ -1,20 +1,39 @@
 # Holy Grails
 Tools for processing Grails media assets
 
-## Installation
-```sh
-$ git clone https://github.com/proofxyz/holy-grails.git
-```
+![image](https://user-images.githubusercontent.com/35775/213267338-bd09abe7-3ac7-4e06-b6f4-a50744eff48d.png)
 
-## Usage
-1. Place media assets in `source` directory.
-2. In a terminal application:
+## Prerequisites
+* [Node.js](https://nodejs.org/en/) required for executing the holy-grails script(s)
+* [Homebrew](https://homebrew.sh/) (optional) used for installing Node.js
+
+
+## Installation
+1. Clone this repository.
+   ```sh
+   $ git clone https://github.com/proofxyz/holy-grails.git
+   ```
+2. Install source dependencies.
    ```sh
    $ cd path/to/holy-grails
-   $ yarn start
+   $ npm install
    ```
 
-The application will log output as it processes the assets.
+## Usage
+1. Create a nested source directory.
+   ```sh
+   $ cd path/to/holy-grails
+   $ mkdir -p assets/source
+   ```
+3. Place media assets in the `assets/source` directory.
+4. Start the application to process the media assets.
+   ```sh
+   $ npm start
+   ```
+
+Processed media assets will be present in `assets/clean`.
+
+The application will log output as it processes the media assets and report its results when it is finished.
 
 ```
 1/11/2023, 11:54:10 AM (0.0s) 🤓 Reading 2 files from ./assets/source…
@@ -24,7 +43,7 @@ The application will log output as it processes the assets.
 1/11/2023, 11:54:10 AM (0.3s) 🙌 Done! All files processed successfully.
 ```
 
-It will report the results when it is finished.
+Errors will be logged and reported.
 
 ```
 1/11/2023, 11:55:03 AM (0.0s) 🤓 Processing 3 files from ./assets/source…
