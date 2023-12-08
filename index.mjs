@@ -36,7 +36,7 @@ let directoryIndex = -1;
 let previousSourceDir = '';
 
 // Create manifest for accounting.
-const manifest = [['source', 'clean']];
+const manifest = [['source', 'clean', 'error']];
 
 for (let i = 0, n = files.length; i < n; i += 1) {
   // Original file info
@@ -88,7 +88,8 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     // Log status.
     const pathRelativeToCleanDirectory = path.relative(CLEAN_DIR, cleanFile);
     log(
-      `🟢 ${count()}\t${pathRelativeToSourceDirectory.padEnd(
+      '🟢',
+      `${count()}\t${pathRelativeToSourceDirectory.padEnd(
         padLength,
         ' ',
       )} ${pathRelativeToCleanDirectory}`,
@@ -107,14 +108,26 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     await remove(processingFile);
 
     // Log status.
+    let errorMsg;
+
     if (typeof error === 'string') {
       // Processing error.
-      const exifError = error.split(' - ')[0];
-      log(`🔴 ${count()}\t${pathRelativeToSourceDirectory}`);
-      log(`\t\t${exifError}`);
+      errorMsg = error.split(' - ')[0];
     } else {
       // Misc. error.
-      log('🟡', error.message.trim());
+      errorMsg = error.message.trim();
+    }
+
+    if (errorMsg) {
+      log(
+        '🔴',
+        `${count()}\t${pathRelativeToSourceDirectory.padEnd(
+          padLength,
+          ' ',
+        )} ${errorMsg}`,
+      );
+
+      manifest.push([pathRelativeToSourceDirectory, '', errorMsg]);
     }
   }
 }
