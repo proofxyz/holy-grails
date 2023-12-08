@@ -13,6 +13,13 @@ export async function makeDir(dirpath) {
   }
 }
 
+export async function write(data, destination, options) {
+  await fs.writeFile(destination, data, options);
+  if (DEBUG_MODE) {
+    log('🚚', `Wrote to ${destination}`);
+  }
+}
+
 export async function copy(origin, destination) {
   await makeDir(path.dirname(destination));
   await fs.copyFile(origin, destination);
@@ -60,12 +67,23 @@ export async function traverse(filepath) {
     (filename) => !ignoredFilenames.has(filename),
   );
 
+  // Sort filenames
+  const sorted = toSorted(filtered, toMacOS);
+
   // Traverse each file.
-  const promises = filtered.map(async (filename) => {
+  const promises = sorted.map(async (filename) => {
     return traverse(path.join(filepath, filename));
   });
 
   const filepaths = await Promise.all(promises);
 
   return filepaths.flat();
+}
+
+function toSorted(array, compare) {
+  return array.slice().sort(compare);
+}
+
+function toMacOS(a, b) {
+  return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
 }

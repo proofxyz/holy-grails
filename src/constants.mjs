@@ -1,6 +1,5 @@
 // Config
 export const DEBUG_MODE = false;
-export const HASH_SALT = 'will eats his boogers';
 
 // Directories
 const TMP_DIR = '/tmp';

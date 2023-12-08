@@ -1,16 +1,14 @@
 import path from 'path';
 import { v4 as uuid } from 'uuid';
-import md5 from 'md5';
 
 import {
   CLEAN_DIR,
   DEBUG_MODE,
-  HASH_SALT,
   PROCESSING_DIR,
   SOURCE_DIR,
 } from './src/constants.mjs';
 import { ORIGINAL_SUFFIX, removeTags } from './src/exif.mjs';
-import { copy, move, remove, traverse } from './src/file.mjs';
+import { copy, move, remove, traverse, write } from './src/file.mjs';
 import { log } from './src/log.mjs';
 
 if (DEBUG_MODE) {
@@ -19,6 +17,12 @@ if (DEBUG_MODE) {
 
 const files = await traverse(SOURCE_DIR);
 log('🤓', `Processing ${files.length} files from ${SOURCE_DIR}…`);
+log('------------------------------------------------------------------------');
+
+// Calculate padding for log output.
+const lengths = files.map((file) => file.length);
+const maxLength = Math.max(...lengths);
+const padLength = maxLength - path.resolve(SOURCE_DIR).length;
 
 let successCount = 0;
 let errorCount = 0;
@@ -31,13 +35,15 @@ function count() {
 let directoryIndex = -1;
 let previousSourceDir = '';
 
+// Create manifest for accounting.
+const manifest = [['source', 'clean']];
+
 for (let i = 0, n = files.length; i < n; i += 1) {
   // Original file info
   const sourceFile = files[i];
   const pathRelativeToSourceDirectory = path.relative(SOURCE_DIR, sourceFile);
   const sourceDir = path.dirname(pathRelativeToSourceDirectory);
   const sourceExt = path.extname(sourceFile);
-  const sourceName = path.basename(sourceFile, sourceExt);
 
   // The processing file is a temporary copy of the source file, used during
   // processing and removed afterward.
@@ -57,14 +63,9 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     directoryIndex++;
   }
 
-  // If the file is at root, use an md5 hash for the filename.
-  const sourceDirIsRoot = sourceDir === '.';
-  const hash = sourceDirIsRoot
-    ? md5(`${HASH_SALT}-${sourceName}${sourceExt}`)
-    : path.basename(sourceDir);
   const cleanFile = path.format({
     dir: path.join(CLEAN_DIR, sourceDir),
-    name: `${directoryIndex}.${hash}`,
+    name: directoryIndex.toString(),
     ext: sourceExt,
   });
 
@@ -85,7 +86,19 @@ for (let i = 0, n = files.length; i < n; i += 1) {
     await remove(backupFile);
 
     // Log status.
-    log(`🟢 ${count()}\t${pathRelativeToSourceDirectory}`);
+    const pathRelativeToCleanDirectory = path.relative(CLEAN_DIR, cleanFile);
+    log(
+      `🟢 ${count()}\t${pathRelativeToSourceDirectory.padEnd(
+        padLength,
+        ' ',
+      )} ${pathRelativeToCleanDirectory}`,
+    );
+
+    // Add to manifest.
+    manifest.push([
+      pathRelativeToSourceDirectory,
+      pathRelativeToCleanDirectory,
+    ]);
   } catch (error) {
     // Increment error count.
     errorCount++;
@@ -109,6 +122,17 @@ for (let i = 0, n = files.length; i < n; i += 1) {
 await remove(PROCESSING_DIR);
 
 log('------------------------------------------------------------------------');
+
+// Write manifest.csv.
+const csvFile = path.join(CLEAN_DIR, 'manifest.csv');
+const csvData = manifest
+  .map((row) => row.map((str) => `"${str}"`).join(','))
+  .join('\n');
+
+await write(csvData, csvFile);
+log('📝', 'manifest.csv written.');
+
+// Done!
 if (errorCount > 0) {
   const pluralized = errorCount > 1 ? 'errors' : 'error';
   log('✋', `Done. Encountered ${errorCount} ${pluralized}.`);
